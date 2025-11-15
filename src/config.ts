@@ -27,13 +27,13 @@ export const config = {
   swapRouterAddress: env.SWAP_ROUTER_ADDRESS,
 
   priceThresholds: {
-    lower: 0.9, // If price is close to this, push it up
-    upper: 1.6, // If price is close to this, push it down
+    lower: 1.5, // If price is close to this, push it up
+    upper: 2, // If price is close to this, push it down
   },
-  intervalMs: 30_000,
+  intervalMs: 60_000,
 
-  minSwapAmount: 500,
-  maxSwapAmount: 5000,
+  minSwapAmount: 10000,
+  maxSwapAmount: 20000,
 
   slippageBps: 50,
 } as const;

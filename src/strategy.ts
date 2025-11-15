@@ -20,17 +20,28 @@ const decideDirection = (poolState: PoolState): DirectionDecision => {
   const range = upper - lower;
   const price = poolState.price.unscaled.toNumber();
 
-  if (price <= lower) return {direction: 'up', intensity: 'high'};
-  if (price >= upper) return {direction: 'down', intensity: 'high'};
+  // Calculate distance from midpoint (-1 to 1, where -1 is at lower, 0 is middle, 1 is at upper)
+  const midpoint = lower + range / 2;
+  const normalizedPosition = (price - midpoint) / (range / 2);
 
-  if (price - lower < range * 0.1) {
-    return {direction: 'up', intensity: 'medium'};
+  // Start with 50% probability of going down, adjust based on position
+  // If price is high (normalizedPosition > 0), increase probability of going down
+  // If price is low (normalizedPosition < 0), decrease probability of going down
+  const downProbability = Math.min(0.5 + normalizedPosition * 0.3, 0.9);
+
+  const direction = Math.random() < downProbability ? 'down' : 'up';
+
+  // Determine intensity based on distance from boundaries
+  let intensity: SwapIntensity;
+
+  if (price <= lower || price >= upper) {
+    intensity = 'high';
+  } else if (price - lower < range * 0.2 || upper - price < range * 0.2) {
+    intensity = 'medium';
+  } else {
+    intensity = 'low';
   }
-  if (upper - price < range * 0.1) {
-    return {direction: 'down', intensity: 'medium'};
-  }
-  const randomDirection = Math.random() > 0.5 ? 'up' : 'down';
-  return {direction: randomDirection, intensity: 'low'};
+  return {direction, intensity};
 };
 
 export const decideSwap = (poolState: PoolState): SwapDecision => {
@@ -53,20 +64,19 @@ const calculateSwapAmount = (intensity: SwapIntensity) => {
 
   switch (intensity) {
     case 'high':
-      multiplier = 75.0;
-      randomnessFactor = 0.05;
+      multiplier = 0.75;
+      randomnessFactor = 0.25;
       break;
     case 'medium':
       multiplier = 0.5;
-      randomnessFactor = 0.15;
+      randomnessFactor = 0.3;
       break;
     case 'low':
       multiplier = 0.25;
-      randomnessFactor = 0.2;
+      randomnessFactor = 0.7;
       break;
   }
-  const baseAmount = Math.floor(range * multiplier);
-  const randomness = Math.floor(Math.random() * range * randomnessFactor);
-
-  return minSwapAmount + baseAmount + randomness;
+  return (
+    minSwapAmount + range * (multiplier + Math.random() * randomnessFactor)
+  );
 };
