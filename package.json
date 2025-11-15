@@ -1,0 +1,39 @@
+{
+  "name": "bun-template",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./build/package.d.ts",
+      "require": "./build/package.cjs",
+      "import": "./build/package.js"
+    }
+  },
+  "scripts": {
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "compile": "tsdown",
+    "fix": "gts fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gts": "^6.0.2",
+    "tsdown": "^0.16.4",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.10.1"
+  },
+  "dependencies": {
+    "timelock-sdk": "^0.0.125",
+    "viem": "^2.39.0",
+    "zod": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=14",
+    "bun": ">=1.0.0"
+  }
+}
